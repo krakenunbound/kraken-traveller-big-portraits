@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root version="3.3" release="1">
+  <properties>
+    <name>Kraken Big Portraits Traveller</name>
+    <version>1.0.0</version>
+    <author>The Kraken</author>
+    <description>A 148 px character portrait at the top of the Traveller character sheet, showing the full picture, with the name beside it (as Kraken35E, SiegeCore and Kraken AD&amp;D Character Sheets have).</description>
+    <loadorder>51</loadorder>
+    <ruleset><name>MGT2</name></ruleset>
+  </properties>
+
+  <announcement>
+    <text>Kraken Big Portraits Traveller v1.0.0</text>
+    <font>systemfont</font>
+  </announcement>
+
+  <base>
+    <includefile source="campaign/record_char_bigportrait.xml" />
+    <includefile source="graphics/graphics_portraits.xml" />
+  </base>
+</root>

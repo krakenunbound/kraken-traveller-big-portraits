@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<root>
+	<windowclass name="charsheet" merge="join">
+		<placement>
+			<size width="600" height="700" />
+		</placement>
+		<sizelimits>
+			<minimum width="600" height="700" />
+			<dynamic />
+		</sizelimits>
+		<sheetdata>
+			<sub_content_top name="overview">
+				<anchored to="contentanchor" height="165">
+					<top relation="relative" offset="0" postoffset="0" />
+					<left />
+					<right />
+				</anchored>
+				<activate />
+				<fastinit />
+				<noscroll />
+				<class>charsheet_overview</class>
+			</sub_content_top>
+		</sheetdata>
+	</windowclass>
+
+	<windowclass name="charsheet_overview" merge="join">
+		<sheetdata>
+			<picture_charsheet_v2 name="portrait">
+				<anchored to="leftanchor" width="148" height="148">
+					<top offset="5" />
+					<left relation="relative" offset="0" postoffset="5" />
+				</anchored>
+				<portraitsize>148</portraitsize>
+				<widgetsize>45</widgetsize>
+				<script>
+					-- The frame shows the full-size picture: the record's "portrait" field
+					-- (FGU saves the chosen picture there) instead of the small character
+					-- list copy. A book pregen falls back to its token. Follows changes.
+					local _sPortraitPath = nil;
+					function createBaseWidget()
+						super.createBaseWidget();
+						local node = window.getDatabaseNode();
+						if node and not _sPortraitPath then
+							_sPortraitPath = DB.getPath(node, "portrait");
+							DB.addHandler(_sPortraitPath, "onUpdate", applyFullPortrait);
+						end
+						applyFullPortrait();
+					end
+					function applyFullPortrait()
+						local node = window.getDatabaseNode();
+						local w = findWidget("portrait");
+						if not node or not w then return; end
+						local bChar = DB.getPath(node):match("^charsheet%.") ~= nil;
+						local sAsset = DB.getValue(node, "portrait", "");
+						if not Interface.isToken(sAsset) and not bChar then
+							sAsset = DB.getValue(node, "token", "");
+						end
+						-- A picture this computer cannot load (a player's own portrait pack
+						-- on another machine) keeps FGU's uploaded copy instead.
+						if Interface.isToken(sAsset) then
+							w.setAsset(sAsset);
+						elseif bChar then
+							w.setBitmap(string.format("portrait_%s_charlist", DB.getName(node)));
+						end
+					end
+					function onClose()
+						if _sPortraitPath then DB.removeHandler(_sPortraitPath, "onUpdate", applyFullPortrait); end
+						if super and super.onClose then super.onClose(); end
+					end
+				</script>
+			</picture_charsheet_v2>
+
+			<string_labeled name="name">
+				<anchored height="30">
+					<top offset="15" />
+					<left parent="portrait" anchor="right" offset="15" />
+					<right parent="rightanchor" relation="current" offset="8" />
+				</anchored>
+				<labelres>char_label_name</labelres>
+				<font>charsheet_header</font>
+			</string_labeled>
+		</sheetdata>
+	</windowclass>
+</root>
